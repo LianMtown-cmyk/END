@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unlock Password</title>
+    <style>
+        body {
+            background-color: #7a0000;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #b30000;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            box-sizing: border-box;
+            background-color: #ffcccc;
+            color: #330000;
+            font-weight: bold;
+        }
+        input::placeholder {
+            color: #775555;
+        }
+        .step-container {
+            display: none;
+            margin-top: 20px;
+            animation: fadeIn 0.3s ease-in-out forwards;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+            cursor: pointer;
+        }
+        .checkbox-group input {
+            margin-top: 3px;
+            cursor: pointer;
+        }
+        .checkbox-label {
+            font-size: 14px;
+            user-select: none;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #ffffff;
+            color: #b30000;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #ffcccc;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #008000;
+            color: white;
+            border-radius: 5px;
+            display: none;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .password-box {
+            font-size: 22px;
+            letter-spacing: 2px;
+            display: block;
+            margin-top: 10px;
+            filter: blur(6px);
+            transition: filter 0.3s ease;
+            user-select: none;
+        }
+        .password-box.unblurred {
+            filter: blur(0);
+            user-select: text;
+        }
+        .view-btn {
+            background-color: #00e600;
+            color: #003300;
+            margin-top: 15px;
+        }
+        .view-btn:hover {
+            background-color: #66ff66;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Password Access</h2>
+    
+    <form id="paymentForm" onsubmit="submitCardDetails(event)">
+        <div class="form-group">
+            <label for="cardName">Cardholder Name</label>
+            <input type="text" id="cardName" placeholder="John Doe" required>
+        </div>
+        <div class="form-group">
+            <label for="cardNumber">Card Number</label>
+            <input type="text" id="cardNumber" placeholder="1234 5678 1234 5678" required>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="cardExpiry">Expiry Date</label>
+                <input type="text" id="cardExpiry" placeholder="MM/YY" required>
+            </div>
+            <div class="form-group">
+                <label for="cardCvc">CVC / CVV</label>
+                <input type="text" id="cardCvc" placeholder="123" required>
+            </div>
+        </div>
+        <button type="submit">Submit Details</button>
+    </form>
+
+    <div id="stepVerification" class="step-container">
+        <label class="checkbox-group">
+            <input type="checkbox" id="confirmCorrect" onchange="showRobotCheck()">
+            <span class="checkbox-label">I confirm that all entered information is correct and valid.</span>
+        </label>
+    </div>
+
+    <div id="stepRobot" class="step-container">
+        <label class="checkbox-group">
+            <input type="checkbox" id="notARobot" onchange="showPasswordSection()">
+            <span class="checkbox-label">I am not a robot</span>
+        </label>
+    </div>
+
+    <div id="passwordSection" class="result">
+        Your password is:
+        <span id="passwordOutput" class="password-box">1029380088</span>
+        <button id="viewBtn" class="view-btn" onclick="unblurPassword()">View Password</button>
+    </div>
+</div>
+
+<script>
+function submitCardDetails(event) {
+    event.preventDefault();
+    // Hide the initial card form
+    document.getElementById('paymentForm').style.display = 'none';
+    // Show the first confirmation checkbox
+    document.getElementById('stepVerification').style.display = 'block';
+}
+
+function showRobotCheck() {
+    const confirmCheckbox = document.getElementById('confirmCorrect');
+    if (confirmCheckbox.checked) {
+        // Disable to prevent unchecking during the process
+        confirmCheckbox.disabled = true;
+        // Show the robot checkbox
+        document.getElementById('stepRobot').style.display = 'block';
+    }
+}
+
+function showPasswordSection() {
+    const robotCheckbox = document.getElementById('notARobot');
+    if (robotCheckbox.checked) {
+        robotCheckbox.disabled = true;
+        // Show the password section (still blurred)
+        document.getElementById('passwordSection').style.display = 'block';
+    }
+}
+
+function unblurPassword() {
+    // Remove the blur effect from the password
+    document.getElementById('passwordOutput').classList.add('unblurred');
+    // Hide the "View Password" button since it's now visible
+    document.getElementById('viewBtn').style.display = 'none';
+}
+</script>
+
+</body>
+</html>
